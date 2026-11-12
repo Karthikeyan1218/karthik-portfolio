@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0b0a09" />
+    <meta name="description" content="Karthikeyan — a cinematic portfolio of 3D furniture designs and motion graphics." />
+    <link rel="preload" href="./models/fancy-sofa.glb" as="fetch" crossorigin />
+    <title>Karthikeyan 3D — Furniture in three dimensions</title>
+    <!-- Styles load with the page itself, so nothing is ever drawn unstyled.
+         The inline rule covers the instant before the stylesheet arrives. -->
+    <style>html,body{background:#0b0a09;margin:0}body>main{visibility:hidden}</style>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230b0a09'/%3E%3Ctext x='16' y='23' text-anchor='middle' font-family='Georgia,serif' font-style='italic' font-size='20' fill='%23e9b872'%3EK%3C/text%3E%3C/svg%3E" />
+    <script type="module" crossorigin src="./assets/index-BBWxUhXR.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-CU9dMHPk.css">
+  </head>
+  <body>
+    <main class="stage" id="stage">
+      <canvas id="scene" aria-label="3D view of the current piece. Drag to turn it, scroll to move closer."></canvas>
+
+      <header class="bar bar--top">
+        <!-- The wordmark is the switch between the two portfolios. -->
+        <h1 class="mark">
+          <button type="button" class="mark__btn" id="modeSwitch">
+            <span class="mark__name">Karthikeyan</span>
+            <span class="mark__mode" aria-hidden="true">
+              <span class="mark__word" data-mode="3d">3D</span>
+              <span class="mark__word" data-mode="motion">Motion Graphics</span>
+            </span>
+            <span class="mark__hint" aria-hidden="true"><i>⇄</i><span id="modeHint">Motion Graphics</span></span>
+          </button>
+        </h1>
+        <p class="bar__note" id="note">Furniture in three dimensions</p>
+        <button type="button" class="step" id="about">About me</button>
+        <p class="count" aria-hidden="true"><span id="countNow">01</span><i></i><span id="countAll">22</span></p>
+      </header>
+
+      <section class="plate" id="plate" aria-live="polite">
+        <p class="plate__kicker"><span id="pieceCat"></span><i></i><span id="pieceNo"></span></p>
+        <h2 class="plate__name"><span id="pieceName"></span><sup id="pieceVariant"></sup></h2>
+        <dl class="plate__specs" id="specs">
+          <div><dt>Triangles</dt><dd>—</dd></div>
+          <div><dt>Vertices</dt><dd>—</dd></div>
+          <div><dt>Textures</dt><dd>—</dd></div>
+        </dl>
+      </section>
+
+      <nav class="views" aria-label="Ways to look at this piece">
+        <button type="button" class="views__toggle" id="viewsToggle" aria-expanded="false" aria-controls="views">
+          <span>View</span><i></i><span id="viewsCurrent">Render</span><b aria-hidden="true"></b>
+        </button>
+        <p class="views__title">View</p>
+        <ol id="views"></ol>
+        <p class="views__note" id="viewNote"></p>
+      </nav>
+
+      <nav class="index" aria-label="Everything in this portfolio">
+        <ol id="index"></ol>
+      </nav>
+
+      <!-- Shown for a beat over the cut when the running order moves to a new chapter. -->
+      <div class="card" id="card" aria-hidden="true">
+        <p class="card__kicker" id="cardKicker"></p>
+        <p class="card__title" id="cardTitle"></p>
+      </div>
+
+      <footer class="bar bar--bottom">
+        <p class="bar__note hint"><span id="hintDrag">Drag to turn</span> <i></i> Scroll to move closer</p>
+        <div class="player" id="player">
+          <button type="button" class="step" id="tour" aria-pressed="false">Play film</button>
+          <button type="button" class="step" id="sound" aria-pressed="false">Sound off</button>
+          <button type="button" class="step" id="fullscreen">Full screen</button>
+        </div>
+        <div class="stepper">
+          <button type="button" class="step" id="prev" aria-label="Previous"><span aria-hidden="true">←</span> Prev</button>
+          <button type="button" class="step" id="next" aria-label="Next">Next <span aria-hidden="true">→</span></button>
+        </div>
+        <div class="progress" id="progress" aria-hidden="true"></div>
+      </footer>
+
+      <!-- About me: who made this, what is in it and how to reach them. A page you scroll. -->
+      <div class="about" id="aboutPanel" role="dialog" aria-modal="true" aria-labelledby="aboutName">
+        <button type="button" class="step about__close" id="aboutClose">Close</button>
+        <div class="about__page" id="aboutPage" tabindex="0">
+          <div class="about__sheet">
+            <header class="about__head">
+              <p class="about__kicker">About me</p>
+              <h2 class="about__name" id="aboutName">Karthikeyan T</h2>
+              <div class="about__sub">
+                <p class="about__role">Motion Designer <i></i> 3D Generalist</p>
+                <p class="about__place">Chennai, India <i></i> Open to remote</p>
+              </div>
+            </header>
+
+            <section class="about__row">
+              <h3 class="about__label"><span>01</span>Profile</h3>
+              <p class="about__statement">
+                I'm Karthik — a motion designer focused on crafting visuals that blend storytelling, design, and
+                movement into meaningful experiences.
+              </p>
+            </section>
+
+            <section class="about__row">
+              <h3 class="about__label"><span>02</span>Portfolio</h3>
+              <div class="about__works">
+                <button type="button" class="about__work" data-go="3d">
+                  <span class="about__num" id="countPieces">22</span>
+                  <span class="about__work-name">Pieces in three dimensions</span>
+                  <span class="about__work-list" id="listPieces"></span>
+                  <span class="about__go">View the 3D work <b aria-hidden="true">→</b></span>
+                </button>
+                <button type="button" class="about__work" data-go="motion">
+                  <span class="about__num" id="countFilms">20</span>
+                  <span class="about__work-name">Films in motion</span>
+                  <span class="about__work-list" id="listFilms"></span>
+                  <span class="about__go">View the films <b aria-hidden="true">→</b></span>
+                </button>
+              </div>
+            </section>
+
+            <section class="about__row">
+              <h3 class="about__label"><span>03</span>Toolkit</h3>
+              <ul class="about__tools">
+                <li><span>After Effects</span><em>Motion</em></li>
+                <li><span>Premiere Pro</span><em>Editing</em></li>
+                <li><span>Photoshop</span><em>Image</em></li>
+                <li><span>Illustrator</span><em>Vector</em></li>
+                <li><span>Blender</span><em>3D</em></li>
+                <li><span>Autodesk Maya</span><em>3D</em></li>
+                <li><span>Substance Painter</span><em>Texturing</em></li>
+              </ul>
+            </section>
+
+            <section class="about__row about__row--contact">
+              <h3 class="about__label"><span>04</span>Contact</h3>
+              <div class="about__reach">
+                <a class="about__mail" href="mailto:karthik.designs18@gmail.com">karthik.designs18@gmail.com</a>
+                <dl class="about__facts">
+                  <div>
+                    <dt>Mobile</dt>
+                    <dd><a href="tel:+918667608703">+91 86676 08703</a></dd>
+                  </div>
+                  <div>
+                    <dt>Based in</dt>
+                    <dd>Chennai, India</dd>
+                  </div>
+                  <div>
+                    <dt>Working</dt>
+                    <dd>Open to remote</dd>
+                  </div>
+                </dl>
+              </div>
+            </section>
+
+            <p class="about__end"><span>© 2026 Karthikeyan T</span><span>Motion design <i></i> 3D</span></p>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>
